@@ -38,6 +38,7 @@ LIB = $(LIB_SONAME).$(VERSION_MINOR).$(VERSION_RELEASE)
 #
 
 SRC = \
+  mce_battery.c \
   mce_display.c \
   mce_proxy.c \
   mce_tklock.c
