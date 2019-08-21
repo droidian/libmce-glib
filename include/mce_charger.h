@@ -30,8 +30,8 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MCE_BATTERY_H
-#define MCE_BATTERY_H
+#ifndef MCE_CHARGER_H
+#define MCE_CHARGER_H
 
 #include "mce_types.h"
 
@@ -39,76 +39,67 @@
 
 G_BEGIN_DECLS
 
-typedef enum mce_battery_status {
-    MCE_BATTERY_UNKNOWN,
-    MCE_BATTERY_EMPTY,
-    MCE_BATTERY_LOW,
-    MCE_BATTERY_OK,
-    MCE_BATTERY_FULL
-} MCE_BATTERY_STATUS;
+typedef enum mce_charger_state {
+    MCE_CHARGER_UNKNOWN,
+    MCE_CHARGER_ON,
+    MCE_CHARGER_OFF
+} MCE_CHARGER_STATE;
 
-typedef struct mce_battery_priv MceBatteryPriv;
+typedef struct mce_charger_priv MceChargerPriv;
 
-typedef struct mce_battery {
+typedef struct mce_charger {
     GObject object;
-    MceBatteryPriv* priv;
+    MceChargerPriv* priv;
     gboolean valid;
-    guint level;
-    MCE_BATTERY_STATUS status;
-} MceBattery;
+    MCE_CHARGER_STATE state;
+} MceCharger;
 
 typedef void
-(*MceBatteryFunc)(
-    MceBattery* battery,
+(*MceChargerFunc)(
+    MceCharger* charger,
     void* arg);
 
-MceBattery*
-mce_battery_new(
+MceCharger*
+mce_charger_new(
     void);
 
-MceBattery*
-mce_battery_ref(
-    MceBattery* battery);
+MceCharger*
+mce_charger_ref(
+    MceCharger* charger);
 
 void
-mce_battery_unref(
-    MceBattery* battery);
+mce_charger_unref(
+    MceCharger* charger);
 
 gulong
-mce_battery_add_valid_changed_handler(
-    MceBattery* battery,
-    MceBatteryFunc fn,
+mce_charger_add_valid_changed_handler(
+    MceCharger* charger,
+    MceChargerFunc fn,
     void* arg);
 
 gulong
-mce_battery_add_level_changed_handler(
-    MceBattery* battery,
-    MceBatteryFunc fn,
-    void* arg);
-
-gulong
-mce_battery_add_status_changed_handler(
-    MceBattery* battery,
-    MceBatteryFunc fn,
+mce_charger_add_state_changed_handler(
+    MceCharger* charger,
+    MceChargerFunc fn,
     void* arg);
 
 void
-mce_battery_remove_handler(
-    MceBattery* battery,
+mce_charger_remove_handler(
+    MceCharger* charger,
     gulong id);
 
 void
-mce_battery_remove_handlers(
-    MceBattery* battery,
+mce_charger_remove_handlers(
+    MceCharger* charger,
     gulong *ids,
     guint count);
 
-#define mce_battery_remove_all_handlers(d, ids) \
-    mce_battery_remove_handlers(d, ids, G_N_ELEMENTS(ids))
+#define mce_charger_remove_all_handlers(d, ids) \
+    mce_charger_remove_handlers(d, ids, G_N_ELEMENTS(ids))
 
 G_END_DECLS
 
-#endif /* MCE_BATTERY_H */
+#endif /* MCE_CHARGER_H */
 
 /*
  * Local Variables:

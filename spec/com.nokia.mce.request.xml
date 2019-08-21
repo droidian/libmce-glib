@@ -16,5 +16,8 @@
     <method name="get_battery_status">
       <arg direction="out" name="battery_status" type="s"/>
     </method>
+    <method name="get_charger_state">
+      <arg direction="out" name="charger_state" type="s"/>
+    </method>
   </interface>
 </node>
