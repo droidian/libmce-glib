@@ -10,5 +10,14 @@
     <method name="get_tklock_mode">
       <arg direction="out" name="mode_name" type="s"/>
     </method>
+    <method name="get_battery_level">
+      <arg direction="out" name="battery_level" type="i"/>
+    </method>
+    <method name="get_battery_status">
+      <arg direction="out" name="battery_status" type="s"/>
+    </method>
+    <method name="get_charger_state">
+      <arg direction="out" name="charger_state" type="s"/>
+    </method>
   </interface>
 </node>

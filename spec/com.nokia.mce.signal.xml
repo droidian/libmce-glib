@@ -10,5 +10,14 @@
     <signal name="tklock_mode_ind">
       <arg name="tklock_mode" type="s"/>
     </signal>
+    <signal name="battery_level_ind">
+      <arg name="battery_level" type="i"/>
+    </signal>
+    <signal name="battery_status_ind">
+      <arg name="battery_status" type="s"/>
+    </signal>
+    <signal name="charger_state_ind">
+      <arg name="charger_state" type="s"/>
+    </signal>
   </interface>
 </node>
