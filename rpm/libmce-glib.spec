@@ -1,10 +1,10 @@
 Name: libmce-glib
-Version: 1.0.4
+Version: 1.0.6
 Release: 0
 Summary: MCE client library
 Group: Development/Libraries
 License: BSD
-URL: https://git.merproject.org/mer-core/libmce-glib
+URL: https://git.sailfishos.org/mer-core/libmce-glib
 Source: %{name}-%{version}.tar.bz2
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(libglibutil)
