@@ -114,18 +114,21 @@ ifneq ($(strip $(DEPS)),)
 endif
 endif
 
-$(GEN_FILES): | $(GEN_DIR)
-$(DEBUG_OBJS): | $(DEBUG_BUILD_DIR)
-$(RELEASE_OBJS): | $(RELEASE_BUILD_DIR)
-
-#
-# Rules
-#
-
 DEBUG_LIB = $(DEBUG_BUILD_DIR)/$(LIB)
 RELEASE_LIB = $(RELEASE_BUILD_DIR)/$(LIB)
 DEBUG_LINK = $(DEBUG_BUILD_DIR)/$(LIB_SONAME)
 RELEASE_LINK = $(RELEASE_BUILD_DIR)/$(LIB_SONAME)
+
+$(GEN_FILES): | $(GEN_DIR)
+$(DEBUG_OBJS): | $(DEBUG_BUILD_DIR)
+$(RELEASE_OBJS): | $(RELEASE_BUILD_DIR)
+$(PKGCONFIG): | $(BUILD_DIR)
+$(DEBUG_LINK): | $(DEBUG_LIB)
+$(RELEASE_LINK): | $(RELEASE_LIB)
+
+#
+# Rules
+#
 
 debug: $(DEBUG_LIB) $(DEBUG_LINK)
 
@@ -164,11 +167,11 @@ $(DEBUG_BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 $(RELEASE_BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 	$(CC) -c $(RELEASE_CFLAGS) -MT"$@" -MF"$(@:%.o=%.d)" $< -o $@
 
-$(DEBUG_LIB): $(DEBUG_BUILD_DIR) $(DEBUG_OBJS)
-	$(LD) $(DEBUG_OBJS) $(DEBUG_LDFLAGS) -o $@
+$(DEBUG_LIB): $(DEBUG_OBJS)
+	$(LD) $(DEBUG_LDFLAGS) $^ -o $@
 
-$(RELEASE_LIB): $(RELEASE_BUILD_DIR) $(RELEASE_OBJS)
-	$(LD) $(RELEASE_OBJS) $(RELEASE_LDFLAGS) -o $@
+$(RELEASE_LIB): $(RELEASE_OBJS)
+	$(LD) $(RELEASE_LDFLAGS) $^ -o $@
 ifeq ($(KEEP_SYMBOLS),0)
 	strip $@
 endif
@@ -187,8 +190,6 @@ $(PKGCONFIG): $(LIB_NAME).pc.in
 #
 
 INSTALL_PERM  = 644
-INSTALL_OWNER = $(shell id -u)
-INSTALL_GROUP = $(shell id -g)
 
 INSTALL = install
 INSTALL_DIRS = $(INSTALL) -d
