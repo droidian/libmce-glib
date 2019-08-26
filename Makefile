@@ -63,14 +63,17 @@ RELEASE_BUILD_DIR = $(BUILD_DIR)/release
 # Tools and flags
 #
 
+ifndef CC
 CC = $(CROSS_COMPILE)gcc
+endif
+
 LD = $(CC)
 WARNINGS = -Wall -Wno-unused-parameter -Wno-multichar
 INCLUDES = -I$(INCLUDE_DIR) -I$(GEN_DIR)
 BASE_FLAGS = -fPIC $(CFLAGS)
 FULL_CFLAGS = $(BASE_FLAGS) $(DEFINES) $(WARNINGS) $(INCLUDES) -MMD -MP \
   $(shell pkg-config --cflags $(PKGS))
-LDFLAGS = $(BASE_FLAGS) -shared -Wl,-soname -Wl,$(LIB_SONAME) \
+FULL_LDFLAGS = $(BASE_FLAGS) $(LDFLAGS) -shared -Wl,-soname -Wl,$(LIB_SONAME)
   $(shell pkg-config --libs $(PKGS))
 DEBUG_FLAGS = -g
 RELEASE_FLAGS =
@@ -85,8 +88,8 @@ endif
 
 DEBUG_CFLAGS = $(FULL_CFLAGS) $(DEBUG_FLAGS) -DDEBUG
 RELEASE_CFLAGS = $(FULL_CFLAGS) $(RELEASE_FLAGS) -O2
-DEBUG_LDFLAGS = $(LDFLAGS) $(DEBUG_FLAGS)
-RELEASE_LDFLAGS = $(LDFLAGS) $(RELEASE_FLAGS)
+DEBUG_LDFLAGS = $(FULL_LDFLAGS) $(DEBUG_FLAGS)
+RELEASE_LDFLAGS = $(FULL_LDFLAGS) $(RELEASE_FLAGS)
 
 #
 # Files
