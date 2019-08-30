@@ -73,8 +73,7 @@ INCLUDES = -I$(INCLUDE_DIR) -I$(GEN_DIR)
 BASE_FLAGS = -fPIC $(CFLAGS)
 FULL_CFLAGS = $(BASE_FLAGS) $(DEFINES) $(WARNINGS) $(INCLUDES) -MMD -MP \
   $(shell pkg-config --cflags $(PKGS))
-FULL_LDFLAGS = $(BASE_FLAGS) $(LDFLAGS) -shared -Wl,-soname -Wl,$(LIB_SONAME) \
-  $(shell pkg-config --libs $(PKGS))
+FULL_LDFLAGS = $(BASE_FLAGS) $(LDFLAGS) -shared -Wl,-soname -Wl,$(LIB_SONAME)
 DEBUG_FLAGS = -g
 RELEASE_FLAGS =
 
@@ -104,6 +103,7 @@ RELEASE_OBJS = \
   $(GEN_SRC:%.c=$(RELEASE_BUILD_DIR)/%.o) \
   $(SRC:%.c=$(RELEASE_BUILD_DIR)/%.o)
 GEN_FILES = $(GEN_SRC:%=$(GEN_DIR)/%)
+LIBS = $(shell pkg-config --libs $(PKGS))
 .PRECIOUS: $(GEN_FILES)
 
 #
@@ -171,10 +171,10 @@ $(RELEASE_BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 	$(CC) -c $(RELEASE_CFLAGS) -MT"$@" -MF"$(@:%.o=%.d)" $< -o $@
 
 $(DEBUG_LIB): $(DEBUG_OBJS)
-	$(LD) $(DEBUG_LDFLAGS) $^ -o $@
+	$(LD) $(DEBUG_LDFLAGS) -o $@ $^ $(LIBS)
 
 $(RELEASE_LIB): $(RELEASE_OBJS)
-	$(LD) $(RELEASE_LDFLAGS) $^ -o $@
+	$(LD) $(RELEASE_LDFLAGS) -o $@ $^ $(LIBS)
 ifeq ($(KEEP_SYMBOLS),0)
 	strip $@
 endif
