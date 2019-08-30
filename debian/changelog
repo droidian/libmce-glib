@@ -1,3 +1,9 @@
+libmce-glib (1.0.7) unstable; urgency=low
+
+  * Allow use of CC & LDFLAGS defined by build system.
+
+ -- Slava Monich <slava.monich@jolla.com>  Fri, 30 Aug 2019 18:14:21 +0300
+
 libmce-glib (1.0.6) unstable; urgency=low
 
   * Added MceBattery object

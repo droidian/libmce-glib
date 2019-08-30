@@ -1,5 +1,5 @@
 Name: libmce-glib
-Version: 1.0.6
+Version: 1.0.7
 Release: 0
 Summary: MCE client library
 Group: Development/Libraries
