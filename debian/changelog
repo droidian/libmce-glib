@@ -1,3 +1,9 @@
+libmce-glib (1.0.8) unstable; urgency=low
+
+  * Avoid overlinking.
+
+ -- Slava Monich <slava.monich@jolla.com>  Tue, 05 Nov 2019 14:21:43 +0300
+
 libmce-glib (1.0.7) unstable; urgency=low
 
   * Allow use of CC & LDFLAGS defined by build system.

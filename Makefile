@@ -1,6 +1,6 @@
 # -*- Mode: makefile-gmake -*-
 
-.PHONY: clean all debug release pkgconfig
+.PHONY: clean all debug release pkgconfig install install-dev
 
 #
 # Required packages
@@ -20,7 +20,7 @@ all: debug release pkgconfig
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_RELEASE = 7
+VERSION_RELEASE = 8
 
 # Version for pkg-config
 PCVERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_RELEASE)
@@ -123,8 +123,8 @@ DEBUG_LINK = $(DEBUG_BUILD_DIR)/$(LIB_SONAME)
 RELEASE_LINK = $(RELEASE_BUILD_DIR)/$(LIB_SONAME)
 
 $(GEN_FILES): | $(GEN_DIR)
-$(DEBUG_OBJS): | $(DEBUG_BUILD_DIR)
-$(RELEASE_OBJS): | $(RELEASE_BUILD_DIR)
+$(DEBUG_OBJS): | $(DEBUG_BUILD_DIR) $(GEN_FILES)
+$(RELEASE_OBJS): | $(RELEASE_BUILD_DIR) $(GEN_FILES)
 $(PKGCONFIG): | $(BUILD_DIR)
 $(DEBUG_LINK): | $(DEBUG_LIB)
 $(RELEASE_LINK): | $(RELEASE_LIB)
