@@ -68,6 +68,7 @@ CC = $(CROSS_COMPILE)gcc
 endif
 
 LD = $(CC)
+DEFINES += -DGLIB_DISABLE_DEPRECATION_WARNINGS
 WARNINGS = -Wall -Wno-unused-parameter -Wno-multichar
 INCLUDES = -I$(INCLUDE_DIR) -I$(GEN_DIR)
 BASE_FLAGS = -fPIC $(CFLAGS)
@@ -185,7 +186,7 @@ $(DEBUG_LINK):
 $(RELEASE_LINK):
 	ln -sf $(LIB) $@
 
-$(PKGCONFIG): $(LIB_NAME).pc.in
+$(PKGCONFIG): $(LIB_NAME).pc.in Makefile
 	sed -e 's/\[version\]/'$(PCVERSION)/g $< > $@
 
 #
