@@ -133,14 +133,13 @@ debug: $(DEBUG_LIB) $(DEBUG_LINK)
 
 release: $(RELEASE_LIB) $(RELEASE_LINK)
 
-pkgconfig: $(PKGCONFIG)
-
 clean:
 	rm -f *~ $(SRC_DIR)/*~ $(INCLUDE_DIR)/*~ rpm/*~
 	rm -fr $(BUILD_DIR) RPMS installroot
 	rm -fr debian/tmp debian/lib$(NAME) debian/lib$(NAME)-dev
 	rm -f documentation.list debian/files debian/*.substvars
 	rm -f debian/*.debhelper.log debian/*.debhelper debian/*~
+	rm -f debian/*.install
 
 $(GEN_DIR):
 	mkdir -p $@
@@ -181,8 +180,17 @@ $(DEBUG_LINK):
 $(RELEASE_LINK):
 	ln -sf $(LIB) $@
 
+# This one could be substituted with arch specific dir
+LIBDIR ?= /usr/lib
+ABS_LIBDIR := $(shell echo /$(LIBDIR) | sed -r 's|/+|/|g')
+
+pkgconfig: $(PKGCONFIG)
+
 $(PKGCONFIG): $(LIB_NAME).pc.in Makefile
-	sed -e 's/\[version\]/'$(PCVERSION)/g $< > $@
+	sed -e 's|@version@|$(PCVERSION)|g' -e 's|@libdir@|$(ABS_LIBDIR)|g' $< > $@
+
+debian/%.install: debian/%.install.in
+	sed 's|@LIBDIR@|$(LIBDIR)|g' $< > $@
 
 #
 # Install
@@ -192,11 +200,9 @@ INSTALL = install
 INSTALL_DIRS = $(INSTALL) -d
 INSTALL_FILES = $(INSTALL) -m 644
 
-INSTALL_LIB_DIR = $(DESTDIR)/usr/lib
+INSTALL_LIB_DIR = $(DESTDIR)$(ABS_LIBDIR)
 INSTALL_INCLUDE_DIR = $(DESTDIR)/usr/include/$(LIB_NAME)
-INSTALL_PKGCONFIG_DIR = $(DESTDIR)/usr/lib/pkgconfig
-
-INSTALL_ALIAS = $(INSTALL_LIB_DIR)/$(LIB_SHORTCUT)
+INSTALL_PKGCONFIG_DIR = $(DESTDIR)$(ABS_LIBDIR)/pkgconfig
 
 install: $(INSTALL_LIB_DIR)
 	$(INSTALL_FILES) $(RELEASE_LIB) $(INSTALL_LIB_DIR)
