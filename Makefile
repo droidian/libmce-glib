@@ -63,10 +63,7 @@ RELEASE_BUILD_DIR = $(BUILD_DIR)/release
 # Tools and flags
 #
 
-ifndef CC
-CC = $(CROSS_COMPILE)gcc
-endif
-
+CC ?= $(CROSS_COMPILE)gcc
 LD = $(CC)
 DEFINES += -DGLIB_DISABLE_DEPRECATION_WARNINGS
 WARNINGS = -Wall -Wno-unused-parameter -Wno-multichar
@@ -74,14 +71,12 @@ INCLUDES = -I$(INCLUDE_DIR) -I$(GEN_DIR)
 BASE_FLAGS = -fPIC $(CFLAGS)
 FULL_CFLAGS = $(BASE_FLAGS) $(DEFINES) $(WARNINGS) $(INCLUDES) -MMD -MP \
   $(shell pkg-config --cflags $(PKGS))
-FULL_LDFLAGS = $(BASE_FLAGS) $(LDFLAGS) -shared -Wl,-soname -Wl,$(LIB_SONAME)
+FULL_LDFLAGS = $(BASE_FLAGS) $(LDFLAGS) -shared -Wl,-soname -Wl,$(LIB_SONAME) \
+  -Wl,--version-script=$(LIB_NAME).map
 DEBUG_FLAGS = -g
 RELEASE_FLAGS =
 
-ifndef KEEP_SYMBOLS
-KEEP_SYMBOLS = 0
-endif
-
+KEEP_SYMBOLS ?= 0
 ifneq ($(KEEP_SYMBOLS),0)
 RELEASE_FLAGS += -g
 endif
@@ -193,11 +188,9 @@ $(PKGCONFIG): $(LIB_NAME).pc.in Makefile
 # Install
 #
 
-INSTALL_PERM  = 644
-
 INSTALL = install
 INSTALL_DIRS = $(INSTALL) -d
-INSTALL_FILES = $(INSTALL) -m $(INSTALL_PERM)
+INSTALL_FILES = $(INSTALL) -m 644
 
 INSTALL_LIB_DIR = $(DESTDIR)/usr/lib
 INSTALL_INCLUDE_DIR = $(DESTDIR)/usr/include/$(LIB_NAME)

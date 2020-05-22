@@ -1,0 +1,6 @@
+{
+    global:
+        mce_*;
+    local:
+        *;
+};
