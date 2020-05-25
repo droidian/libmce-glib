@@ -1,3 +1,10 @@
+libmce-glib (1.0.10) unstable; urgency=low
+
+  * Hide internal symbols
+  * Respect arch specific lib dir
+
+ -- Slava Monich <slava.monich@jolla.com>  Mon, 25 May 2020 15:11:04 +0300
+
 libmce-glib (1.0.9) unstable; urgency=low
 
   * Ignore GLib deprecation warnings
