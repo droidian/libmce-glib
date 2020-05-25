@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016-2020 Jolla Ltd.
- * Copyright (C) 2016-2020 Slava Monich <slava.monich@jolla.com>
+ * Copyright (C) 2020 Jolla Ltd.
+ * Copyright (C) 2020 Slava Monich <slava.monich@jolla.com>
  *
  * You may use this file under the terms of BSD license as follows:
  *
@@ -34,57 +34,15 @@
  * any official policies, either expressed or implied.
  */
 
-#ifndef MCE_PROXY_H
-#define MCE_PROXY_H
+#ifndef MCE_TYPES_PRIVATE_H
+#define MCE_TYPES_PRIVATE_H
 
-#include "mce_types_p.h"
+#include <mce_types.h>
 
-typedef struct mce_proxy_priv MceProxyPriv;
-struct _ComNokiaMceSignal;
-struct _ComNokiaMceRequest;
+/* Macros */
+#define MCE_INTERNAL G_GNUC_INTERNAL
 
-typedef struct mce_proxy {
-    GObject object;
-    MceProxyPriv* priv;
-    gboolean valid;
-    struct _ComNokiaMceSignal* signal;
-    struct _ComNokiaMceRequest* request;
-} MceProxy;
-
-typedef void
-(*MceProxyFunc)(
-    MceProxy* proxy,
-    void* arg);
-
-MceProxy*
-mce_proxy_new(
-    void)
-    MCE_INTERNAL;
-
-MceProxy*
-mce_proxy_ref(
-    MceProxy* proxy)
-    MCE_INTERNAL;
-
-void
-mce_proxy_unref(
-    MceProxy* proxy)
-    MCE_INTERNAL;
-
-gulong
-mce_proxy_add_valid_changed_handler(
-    MceProxy* proxy,
-    MceProxyFunc fn,
-    void* arg)
-    MCE_INTERNAL;
-
-void
-mce_proxy_remove_handler(
-    MceProxy* proxy,
-    gulong id)
-    MCE_INTERNAL;
-
-#endif /* MCE_PROXY_H */
+#endif /* MCE_TYPES_PRIVATE_H */
 
 /*
  * Local Variables:

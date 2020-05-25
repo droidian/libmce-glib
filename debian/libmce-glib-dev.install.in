@@ -1,0 +1,3 @@
+debian/tmp/@LIBDIR@/libmce-glib.so @LIBDIR@
+debian/tmp/@LIBDIR@/pkgconfig/libmce-glib.pc @LIBDIR@/pkgconfig
+debian/tmp/usr/include/* usr/include
