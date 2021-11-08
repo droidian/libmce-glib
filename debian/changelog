@@ -1,3 +1,9 @@
+libmce-glib (1.0.12) unstable; urgency=low
+
+  * Housekeeping release
+
+ -- Slava Monich <slava.monich@jolla.com>  Mon, 08 Nov 2021 02:44:15 +0200
+
 libmce-glib (1.0.10) unstable; urgency=low
 
   * Hide internal symbols

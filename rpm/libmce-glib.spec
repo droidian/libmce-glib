@@ -1,6 +1,6 @@
 Name: libmce-glib
 
-Version: 1.0.10
+Version: 1.0.12
 Release: 0
 Summary: MCE client library
 License: BSD
