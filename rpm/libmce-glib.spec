@@ -1,15 +1,20 @@
 Name: libmce-glib
+
 Version: 1.0.10
 Release: 0
 Summary: MCE client library
-Group: Development/Libraries
 License: BSD
-URL: https://git.sailfishos.org/mer-core/libmce-glib
+URL: https://github.com/sailfishos/libmce-glib
 Source: %{name}-%{version}.tar.bz2
+
+%define libglibutil_version 1.0.5
+
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  pkgconfig(libglibutil)
-BuildRequires:  pkgconfig(mce)
-Requires: libglibutil >= 1.0.5
+BuildRequires: pkgconfig(libglibutil) >= %{libglibutil_version}
+BuildRequires:  pkgconfig(mce) >= 1.24.0
+
+Requires: libglibutil >= %{libglibutil_version}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -19,7 +24,6 @@ Provides glib-based MCE client API
 %package devel
 Summary: Development library for %{name}
 Requires: %{name} = %{version}
-Requires: pkgconfig
 
 %description devel
 This package contains the development library for %{name}.
@@ -28,7 +32,7 @@ This package contains the development library for %{name}.
 %setup -q
 
 %build
-make LIBDIR=%{_libdir} KEEP_SYMBOLS=1 release pkgconfig
+make %{_smp_mflags} LIBDIR=%{_libdir} KEEP_SYMBOLS=1 release pkgconfig
 
 %install
 rm -rf %{buildroot}
