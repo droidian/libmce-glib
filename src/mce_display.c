@@ -257,7 +257,7 @@ mce_display_remove_handler(
 void
 mce_display_remove_handlers(
     MceDisplay* self,
-    gulong *ids,
+    gulong* ids,
     guint count)
 {
     gutil_disconnect_handlers(self, ids, count);

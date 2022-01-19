@@ -37,9 +37,11 @@
 #ifndef MCE_CHARGER_H
 #define MCE_CHARGER_H
 
+/* Since 1.0.6 */
+
 #include "mce_types.h"
 
-/* Since 1.0.6 */
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
@@ -51,12 +53,12 @@ typedef enum mce_charger_state {
 
 typedef struct mce_charger_priv MceChargerPriv;
 
-typedef struct mce_charger {
+struct mce_charger {
     GObject object;
     MceChargerPriv* priv;
     gboolean valid;
     MCE_CHARGER_STATE state;
-} MceCharger;
+}; /* MceCharger */
 
 typedef void
 (*MceChargerFunc)(
@@ -95,7 +97,7 @@ mce_charger_remove_handler(
 void
 mce_charger_remove_handlers(
     MceCharger* charger,
-    gulong *ids,
+    gulong* ids,
     guint count);
 
 #define mce_charger_remove_all_handlers(d, ids) \

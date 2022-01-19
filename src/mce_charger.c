@@ -257,7 +257,7 @@ mce_charger_remove_handler(
 void
 mce_charger_remove_handlers(
     MceCharger* self,
-    gulong *ids,
+    gulong* ids,
     guint count)
 {
     gutil_disconnect_handlers(self, ids, count);

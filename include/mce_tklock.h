@@ -39,6 +39,8 @@
 
 #include "mce_types.h"
 
+#include <glib-object.h>
+
 G_BEGIN_DECLS
 
 typedef enum mce_tklock_mode {
@@ -53,13 +55,13 @@ typedef enum mce_tklock_mode {
 
 typedef struct mce_tklock_priv MceTklockPriv;
 
-typedef struct mce_tklock {
+struct mce_tklock {
     GObject object;
     MceTklockPriv* priv;
     gboolean valid;
     MCE_TKLOCK_MODE mode;
     gboolean locked;
-} MceTklock;
+}; /* MceTklock */
 
 typedef void
 (*MceTklockFunc)(
@@ -104,7 +106,7 @@ mce_tklock_remove_handler(
 void
 mce_tklock_remove_handlers(
     MceTklock* tklock,
-    gulong *ids,
+    gulong* ids,
     guint count);
 
 #define mce_tklock_remove_all_handlers(t, ids) \

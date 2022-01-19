@@ -38,7 +38,15 @@
 #define MCE_TYPES_H
 
 #include <glib.h>
-#include <glib-object.h>
+
+G_BEGIN_DECLS
+
+typedef struct mce_battery MceBattery;
+typedef struct mce_charger MceCharger;
+typedef struct mce_display MceDisplay;
+typedef struct mce_tklock MceTklock;
+
+G_END_DECLS
 
 #endif /* MCE_TYPES_H */
 

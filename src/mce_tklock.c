@@ -289,7 +289,7 @@ mce_tklock_remove_handler(
 void
 mce_tklock_remove_handlers(
     MceTklock* self,
-    gulong *ids,
+    gulong* ids,
     guint count)
 {
     gutil_disconnect_handlers(self, ids, count);

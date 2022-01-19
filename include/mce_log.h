@@ -38,6 +38,7 @@
 #define MCE_LOG_H
 
 #include "mce_types.h"
+
 #include <gutil_types.h>
 
 G_BEGIN_DECLS

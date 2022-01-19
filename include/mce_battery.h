@@ -37,9 +37,11 @@
 #ifndef MCE_BATTERY_H
 #define MCE_BATTERY_H
 
+/* Since 1.0.6 */
+
 #include "mce_types.h"
 
-/* Since 1.0.6 */
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
@@ -53,13 +55,13 @@ typedef enum mce_battery_status {
 
 typedef struct mce_battery_priv MceBatteryPriv;
 
-typedef struct mce_battery {
+struct mce_battery {
     GObject object;
     MceBatteryPriv* priv;
     gboolean valid;
     guint level;
     MCE_BATTERY_STATUS status;
-} MceBattery;
+}; /* MceBattery */
 
 typedef void
 (*MceBatteryFunc)(
@@ -104,7 +106,7 @@ mce_battery_remove_handler(
 void
 mce_battery_remove_handlers(
     MceBattery* battery,
-    gulong *ids,
+    gulong* ids,
     guint count);
 
 #define mce_battery_remove_all_handlers(d, ids) \

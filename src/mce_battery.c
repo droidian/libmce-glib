@@ -357,7 +357,7 @@ mce_battery_remove_handler(
 void
 mce_battery_remove_handlers(
     MceBattery* self,
-    gulong *ids,
+    gulong* ids,
     guint count)
 {
     gutil_disconnect_handlers(self, ids, count);

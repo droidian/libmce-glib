@@ -39,6 +39,8 @@
 
 #include "mce_types_p.h"
 
+#include <glib-object.h>
+
 typedef struct mce_proxy_priv MceProxyPriv;
 struct _ComNokiaMceSignal;
 struct _ComNokiaMceRequest;
