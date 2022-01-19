@@ -14,6 +14,10 @@ BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(libglibutil) >= %{libglibutil_version}
 BuildRequires:  pkgconfig(mce) >= 1.24.0
 
+# license macro requires rpm >= 4.11
+BuildRequires: pkgconfig(rpm)
+%define license_support %(pkg-config --exists 'rpm >= 4.11'; echo $?)
+
 Requires: libglibutil >= %{libglibutil_version}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -45,6 +49,9 @@ make LIBDIR=%{_libdir} DESTDIR=%{buildroot} install-dev
 %files
 %defattr(-,root,root,-)
 %{_libdir}/%{name}.so.*
+%if %{license_support} == 0
+%license LICENSE
+%endif
 
 %files devel
 %defattr(-,root,root,-)
