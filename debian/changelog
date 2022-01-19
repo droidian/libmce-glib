@@ -1,3 +1,10 @@
+libmce-glib (1.0.13) unstable; urgency=low
+
+  * Shuffled includes a bit
+  * Unified and freshened up licenses
+
+ -- Slava Monich <slava.monich@jolla.com>  Wed, 19 Jan 2022 14:21:38 +0200
+
 libmce-glib (1.0.12) unstable; urgency=low
 
   * Housekeeping release
