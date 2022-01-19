@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016-2020 Jolla Ltd.
- * Copyright (C) 2016-2020 Slava Monich <slava.monich@jolla.com>
+ * Copyright (C) 2016-2022 Jolla Ltd.
+ * Copyright (C) 2016-2022 Slava Monich <slava.monich@jolla.com>
  *
  * You may use this file under the terms of BSD license as follows:
  *
