@@ -19,5 +19,8 @@
     <signal name="charger_state_ind">
       <arg name="charger_state" type="s"/>
     </signal>
+    <signal name="system_inactivity_ind">
+      <arg name="device_inactive" type="b"/>
+    </signal>
   </interface>
 </node>
