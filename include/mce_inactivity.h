@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2016 - 2023 Jolla Ltd.
- * Copyright (c) 2016 - 2022 Slava Monich <slava.monich@jolla.com>
  *
  * You may use this file under the terms of BSD license as follows:
  *
@@ -34,22 +33,70 @@
  * any official policies, either expressed or implied.
  */
 
-#ifndef MCE_TYPES_H
-#define MCE_TYPES_H
+#ifndef MCE_INACTIVITY_H
+#define MCE_INACTIVITY_H
 
-#include <glib.h>
+#include "mce_types.h"
+
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-typedef struct mce_battery MceBattery;
-typedef struct mce_charger MceCharger;
-typedef struct mce_display MceDisplay;
-typedef struct mce_inactivity MceInactivity;
-typedef struct mce_tklock MceTklock;
+typedef struct mce_inactivity_priv MceInactivityPriv;
+
+struct mce_inactivity {
+    GObject object;
+    MceInactivityPriv* priv;
+    gboolean valid;
+    gboolean status;
+}; /* MceInactivity */
+
+typedef void
+(*MceInactivityFunc)(
+    MceInactivity* inactivity,
+    void* arg);
+
+MceInactivity*
+mce_inactivity_new(
+    void);
+
+MceInactivity*
+mce_inactivity_ref(
+    MceInactivity* inactivity);
+
+void
+mce_inactivity_unref(
+    MceInactivity* inactivity);
+
+gulong
+mce_inactivity_add_valid_changed_handler(
+    MceInactivity* inactivity,
+    MceInactivityFunc fn,
+    void* arg);
+
+gulong
+mce_inactivity_add_status_changed_handler(
+    MceInactivity* inactivity,
+    MceInactivityFunc fn,
+    void* arg);
+
+void
+mce_inactivity_remove_handler(
+    MceInactivity* inactivity,
+    gulong id);
+
+void
+mce_inactivity_remove_handlers(
+    MceInactivity* inactivity,
+    gulong* ids,
+    guint count);
+
+#define mce_inactivity_remove_all_handlers(t, ids) \
+        mce_inactivity_remove_handlers(t, ids, G_N_ELEMENTS(ids))
 
 G_END_DECLS
 
-#endif /* MCE_TYPES_H */
+#endif /* MCE_INACTIVITY_H */
 
 /*
  * Local Variables:

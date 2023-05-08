@@ -19,5 +19,8 @@
     <method name="get_charger_state">
       <arg direction="out" name="charger_state" type="s"/>
     </method>
+    <method name="get_inactivity_status">
+      <arg direction="out" name="device_inactive" type="b"/>
+    </method>
   </interface>
 </node>
