@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2016-2022 Jolla Ltd.
- * Copyright (C) 2016-2022 Slava Monich <slava.monich@jolla.com>
+ * Copyright (c) 2016 - 2023 Jolla Ltd.
  *
  * You may use this file under the terms of BSD license as follows:
  *
@@ -34,7 +33,7 @@
  * any official policies, either expressed or implied.
  */
 
-#include "mce_display.h"
+#include "mce_inactivity.h"
 #include "mce_proxy.h"
 #include "mce_log_p.h"
 
@@ -47,29 +46,29 @@
 #include "com.nokia.mce.request.h"
 #include "com.nokia.mce.signal.h"
 
-struct mce_display_priv {
+struct mce_inactivity_priv {
     MceProxy* proxy;
     gulong proxy_valid_id;
-    gulong display_status_ind_id;
+    gulong inactivity_status_ind_id;
 };
 
-enum mce_display_signal {
+enum mce_inactivity_signal {
     SIGNAL_VALID_CHANGED,
-    SIGNAL_STATE_CHANGED,
+    SIGNAL_STATUS_CHANGED,
     SIGNAL_COUNT
 };
 
-#define SIGNAL_VALID_CHANGED_NAME   "mce-display-valid-changed"
-#define SIGNAL_STATE_CHANGED_NAME   "mce-display-state-changed"
+#define SIGNAL_VALID_CHANGED_NAME  "mce-inactivity-valid-changed"
+#define SIGNAL_STATUS_CHANGED_NAME "mce-inactivity-mode-changed"
 
-static guint mce_display_signals[SIGNAL_COUNT] = { 0 };
+static guint mce_inactivity_signals[SIGNAL_COUNT] = { 0 };
 
-typedef GObjectClass MceDisplayClass;
-G_DEFINE_TYPE(MceDisplay, mce_display, G_TYPE_OBJECT)
-#define PARENT_CLASS mce_display_parent_class
-#define MCE_DISPLAY_TYPE (mce_display_get_type())
-#define MCE_DISPLAY(obj) (G_TYPE_CHECK_INSTANCE_CAST(obj,\
-        MCE_DISPLAY_TYPE,MceDisplay))
+typedef GObjectClass MceInactivityClass;
+G_DEFINE_TYPE(MceInactivity, mce_inactivity, G_TYPE_OBJECT)
+#define PARENT_CLASS mce_inactivity_parent_class
+#define MCE_INACTIVITY_TYPE (mce_inactivity_get_type())
+#define MCE_INACTIVITY(obj) (G_TYPE_CHECK_INSTANCE_CAST(obj,\
+        MCE_INACTIVITY_TYPE,MceInactivity))
 
 /*==========================================================================*
  * Implementation
@@ -77,109 +76,99 @@ G_DEFINE_TYPE(MceDisplay, mce_display, G_TYPE_OBJECT)
 
 static
 void
-mce_display_status_update(
-    MceDisplay* self,
-    const char* status)
+mce_inactivity_status_update(
+    MceInactivity* self,
+    gboolean status)
 {
-    MCE_DISPLAY_STATE state;
-    MceDisplayPriv* priv = self->priv;
-
-    if (!g_strcmp0(status, MCE_DISPLAY_OFF_STRING)) {
-        state = MCE_DISPLAY_STATE_OFF;
-    } else if (!g_strcmp0(status, MCE_DISPLAY_DIM_STRING)) {
-        state = MCE_DISPLAY_STATE_DIM;
-    } else {
-        GASSERT(!g_strcmp0(status, MCE_DISPLAY_ON_STRING));
-        state = MCE_DISPLAY_STATE_ON;
-    }
-    if (self->state != state) {
-        self->state = state;
-        g_signal_emit(self, mce_display_signals[SIGNAL_STATE_CHANGED], 0);
+    MceInactivityPriv* priv = self->priv;
+    const gboolean prev_status = self->status;
+    self->status = status;
+    if (self->status != prev_status) {
+        g_signal_emit(self, mce_inactivity_signals[SIGNAL_STATUS_CHANGED], 0);
     }
     if (priv->proxy->valid && !self->valid) {
         self->valid = TRUE;
-        g_signal_emit(self, mce_display_signals[SIGNAL_VALID_CHANGED], 0);
+        g_signal_emit(self, mce_inactivity_signals[SIGNAL_VALID_CHANGED], 0);
     }
 }
 
 static
 void
-mce_display_status_query_done(
+mce_inactivity_status_query_done(
     GObject* proxy,
     GAsyncResult* result,
     gpointer arg)
 {
     GError* error = NULL;
-    char* status = NULL;
-    MceDisplay* self = MCE_DISPLAY(arg);
+    gboolean status = FALSE;
+    MceInactivity* self = MCE_INACTIVITY(arg);
 
-    if (com_nokia_mce_request_call_get_display_status_finish(
+    if (com_nokia_mce_request_call_get_inactivity_status_finish(
         COM_NOKIA_MCE_REQUEST(proxy), &status, result, &error)) {
-        GDEBUG("Display is currently %s", status);
-        mce_display_status_update(self, status);
-        g_free(status);
+        GDEBUG("inactivlty is currently %s", status ? "true" : "false");
+        mce_inactivity_status_update(self, status);
     } else {
         /*
-         * We could retry but it's probably not worth the trouble
-         * because the next time display state changes we receive
-         * display_status_ind signal and sync our state with mce.
+         * We could retry but it's probably not worth the trouble.
+         * There is signal broadcast on mce startup / when inactivity
+         * state changes.
          * Until then, this object stays invalid.
          */
-        GWARN("Failed to query display state %s", GERRMSG(error));
+        GWARN("Failed to query inactivity status %s", GERRMSG(error));
         g_error_free(error);
     }
-    mce_display_unref(self);
+    mce_inactivity_unref(self);
 }
 
 static
 void
-mce_display_status_ind(
+mce_inactivity_status_ind(
     ComNokiaMceSignal* proxy,
-    const char* status,
+    gboolean status,
     gpointer arg)
 {
-    GDEBUG("Display is %s", status);
-    mce_display_status_update(MCE_DISPLAY(arg), status);
+    GDEBUG("status is %s", status ? "true" : "false");
+    mce_inactivity_status_update(MCE_INACTIVITY(arg), status);
 }
 
 static
 void
-mce_display_status_query(
-    MceDisplay* self)
+mce_inactivity_status_query(
+    MceInactivity* self)
 {
-    MceDisplayPriv* priv = self->priv;
+    MceInactivityPriv* priv = self->priv;
     MceProxy* proxy = priv->proxy;
 
     /*
      * proxy->signal and proxy->request may not be available at the
-     * time when MceDisplay is created. In that case we have to wait
-     * for the valid signal before we can connect the display state
+     * time when MceInactivity is created. In that case we have to wait
+     * for the valid signal before we can connect the inactivity status
      * signal and submit the initial query.
      */
-    if (proxy->signal && !priv->display_status_ind_id) {
-        priv->display_status_ind_id = g_signal_connect(proxy->signal,
-            MCE_DISPLAY_SIG, G_CALLBACK(mce_display_status_ind), self);
+    if (proxy->signal && !priv->inactivity_status_ind_id) {
+        priv->inactivity_status_ind_id = g_signal_connect(proxy->signal,
+            MCE_INACTIVITY_SIG, G_CALLBACK(mce_inactivity_status_ind), self);
     }
     if (proxy->request && proxy->valid) {
-        com_nokia_mce_request_call_get_display_status(proxy->request, NULL,
-            mce_display_status_query_done, mce_display_ref(self));
+        com_nokia_mce_request_call_get_inactivity_status(proxy->request, NULL,
+            mce_inactivity_status_query_done, mce_inactivity_ref(self));
     }
 }
 
 static
 void
-mce_display_valid_changed(
+mce_inactivity_valid_changed(
     MceProxy* proxy,
     void* arg)
 {
-    MceDisplay* self = MCE_DISPLAY(arg);
+    MceInactivity* self = MCE_INACTIVITY(arg);
 
     if (proxy->valid) {
-        mce_display_status_query(self);
+        mce_inactivity_status_query(self);
     } else {
         if (self->valid) {
             self->valid = FALSE;
-            g_signal_emit(self, mce_display_signals[SIGNAL_VALID_CHANGED], 0);
+            g_signal_emit(self, mce_inactivity_signals[SIGNAL_VALID_CHANGED], 0);
         }
     }
 }
@@ -188,46 +177,45 @@ mce_display_valid_changed(
  * API
  *==========================================================================*/
 
-MceDisplay*
-mce_display_new()
+MceInactivity*
+mce_inactivity_new()
 {
-    /* MCE assumes one display */
-    static MceDisplay* mce_display_instance = NULL;
+    static MceInactivity* mce_inactivity_instance = NULL;
 
-    if (mce_display_instance) {
-        mce_display_ref(mce_display_instance);
+    if (mce_inactivity_instance) {
+        mce_inactivity_ref(mce_inactivity_instance);
     } else {
-        mce_display_instance = g_object_new(MCE_DISPLAY_TYPE, NULL);
-        mce_display_status_query(mce_display_instance);
-        g_object_add_weak_pointer(G_OBJECT(mce_display_instance),
-            (gpointer*)(&mce_display_instance));
+        mce_inactivity_instance = g_object_new(MCE_INACTIVITY_TYPE, NULL);
+        mce_inactivity_status_query(mce_inactivity_instance);
+        g_object_add_weak_pointer(G_OBJECT(mce_inactivity_instance),
+            (gpointer*)(&mce_inactivity_instance));
     }
-    return mce_display_instance;
+    return mce_inactivity_instance;
 }
 
-MceDisplay*
-mce_display_ref(
-    MceDisplay* self)
+MceInactivity*
+mce_inactivity_ref(
+    MceInactivity* self)
 {
     if (G_LIKELY(self)) {
-        g_object_ref(MCE_DISPLAY(self));
+        g_object_ref(MCE_INACTIVITY(self));
     }
     return self;
 }
 
 void
-mce_display_unref(
-    MceDisplay* self)
+mce_inactivity_unref(
+    MceInactivity* self)
 {
     if (G_LIKELY(self)) {
-        g_object_unref(MCE_DISPLAY(self));
+        g_object_unref(MCE_INACTIVITY(self));
     }
 }
 
 gulong
-mce_display_add_valid_changed_handler(
-    MceDisplay* self,
-    MceDisplayFunc fn,
+mce_inactivity_add_valid_changed_handler(
+    MceInactivity* self,
+    MceInactivityFunc fn,
     void* arg)
 {
     return (G_LIKELY(self) && G_LIKELY(fn)) ? g_signal_connect(self,
@@ -235,18 +223,18 @@ mce_display_add_valid_changed_handler(
 }
 
 gulong
-mce_display_add_state_changed_handler(
-    MceDisplay* self,
-    MceDisplayFunc fn,
+mce_inactivity_add_status_changed_handler(
+    MceInactivity* self,
+    MceInactivityFunc fn,
     void* arg)
 {
     return (G_LIKELY(self) && G_LIKELY(fn)) ? g_signal_connect(self,
-        SIGNAL_STATE_CHANGED_NAME, G_CALLBACK(fn), arg) : 0;
+        SIGNAL_STATUS_CHANGED_NAME, G_CALLBACK(fn), arg) : 0;
 }
 
 void
-mce_display_remove_handler(
-    MceDisplay* self,
+mce_inactivity_remove_handler(
+    MceInactivity* self,
     gulong id)
 {
     if (G_LIKELY(self) && G_LIKELY(id)) {
@@ -255,8 +243,8 @@ mce_display_remove_handler(
 }
 
 void
-mce_display_remove_handlers(
-    MceDisplay* self,
+mce_inactivity_remove_handlers(
+    MceInactivity* self,
     gulong* ids,
     guint count)
 {
@@ -269,29 +257,30 @@ mce_display_remove_handlers(
 
 static
 void
-mce_display_init(
-    MceDisplay* self)
+mce_inactivity_init(
+    MceInactivity* self)
 {
-    MceDisplayPriv* priv = G_TYPE_INSTANCE_GET_PRIVATE(self, MCE_DISPLAY_TYPE,
-        MceDisplayPriv);
+    MceInactivityPriv* priv = G_TYPE_INSTANCE_GET_PRIVATE(self, MCE_INACTIVITY_TYPE,
+        MceInactivityPriv);
 
     self->priv = priv;
+    self->status = FALSE;
     priv->proxy = mce_proxy_new();
     priv->proxy_valid_id = mce_proxy_add_valid_changed_handler(priv->proxy,
-        mce_display_valid_changed, self);
+        mce_inactivity_valid_changed, self);
 }
 
 static
 void
-mce_display_finalize(
+mce_inactivity_finalize(
     GObject* object)
 {
-    MceDisplay* self = MCE_DISPLAY(object);
-    MceDisplayPriv* priv = self->priv;
+    MceInactivity* self = MCE_INACTIVITY(object);
+    MceInactivityPriv* priv = self->priv;
 
-    if (priv->display_status_ind_id) {
+    if (priv->inactivity_status_ind_id) {
         g_signal_handler_disconnect(priv->proxy->signal,
-            priv->display_status_ind_id);
+            priv->inactivity_status_ind_id);
     }
     mce_proxy_remove_handler(priv->proxy, priv->proxy_valid_id);
     mce_proxy_unref(priv->proxy);
@@ -300,27 +289,27 @@ mce_display_finalize(
 
 static
 void
-mce_display_class_init(
-    MceDisplayClass* klass)
+mce_inactivity_class_init(
+    MceInactivityClass* klass)
 {
     GObjectClass* object_class = G_OBJECT_CLASS(klass);
 
-    object_class->finalize = mce_display_finalize;
-    g_type_class_add_private(klass, sizeof(MceDisplayPriv));
-    mce_display_signals[SIGNAL_VALID_CHANGED] =
+    object_class->finalize = mce_inactivity_finalize;
+    g_type_class_add_private(klass, sizeof(MceInactivityPriv));
+    mce_inactivity_signals[SIGNAL_VALID_CHANGED] =
         g_signal_new(SIGNAL_VALID_CHANGED_NAME,
             G_OBJECT_CLASS_TYPE(klass), G_SIGNAL_RUN_FIRST,
             0, NULL, NULL, NULL, G_TYPE_NONE, 0);
-    mce_display_signals[SIGNAL_STATE_CHANGED] =
-        g_signal_new(SIGNAL_STATE_CHANGED_NAME,
+    mce_inactivity_signals[SIGNAL_STATUS_CHANGED] =
+        g_signal_new(SIGNAL_STATUS_CHANGED_NAME,
             G_OBJECT_CLASS_TYPE(klass), G_SIGNAL_RUN_FIRST,
             0, NULL, NULL, NULL, G_TYPE_NONE, 0);
 }
 
 /*
  * Local Variables:
- * mode: C
+ * status: C
  * c-basic-offset: 4
- * indent-tabs-mode: nil
+ * indent-tabs-status: nil
  * End:
  */

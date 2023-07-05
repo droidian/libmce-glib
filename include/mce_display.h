@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016-2017 Jolla Ltd.
- * Contact: Slava Monich <slava.monich@jolla.com>
+ * Copyright (C) 2016-2022 Jolla Ltd.
+ * Copyright (C) 2016-2022 Slava Monich <slava.monich@jolla.com>
  *
  * You may use this file under the terms of BSD license as follows:
  *
@@ -13,9 +13,9 @@
  *   2. Redistributions in binary form must reproduce the above copyright
  *      notice, this list of conditions and the following disclaimer in the
  *      documentation and/or other materials provided with the distribution.
- *   3. Neither the name of Jolla Ltd nor the names of its contributors may
- *      be used to endorse or promote products derived from this software
- *      without specific prior written permission.
+ *   3. Neither the names of the copyright holders nor the names of its
+ *      contributors may be used to endorse or promote products derived
+ *      from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -39,6 +39,8 @@
 
 #include "mce_types.h"
 
+#include <glib-object.h>
+
 G_BEGIN_DECLS
 
 typedef enum mce_display_state {
@@ -49,12 +51,12 @@ typedef enum mce_display_state {
 
 typedef struct mce_display_priv MceDisplayPriv;
 
-typedef struct mce_display {
+struct mce_display {
     GObject object;
     MceDisplayPriv* priv;
     gboolean valid;
     MCE_DISPLAY_STATE state;
-} MceDisplay;
+}; /* MceDisplay */
 
 typedef void
 (*MceDisplayFunc)(
@@ -93,7 +95,7 @@ mce_display_remove_handler(
 void
 mce_display_remove_handlers(
     MceDisplay* display,
-    gulong *ids,
+    gulong* ids,
     guint count);
 
 #define mce_display_remove_all_handlers(d, ids) \

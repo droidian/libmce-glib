@@ -1,3 +1,23 @@
+libmce-glib (1.1.0) unstable; urgency=low
+
+  * Add an example application
+  * Add MceInactivity object
+
+ -- Simo Piiroinen <simo.piiroinen@jolla.com>  Mon, 08 May 2023 10:46:08 +0300
+
+libmce-glib (1.0.13) unstable; urgency=low
+
+  * Shuffled includes a bit
+  * Unified and freshened up licenses
+
+ -- Slava Monich <slava.monich@jolla.com>  Wed, 19 Jan 2022 14:21:38 +0200
+
+libmce-glib (1.0.12) unstable; urgency=low
+
+  * Housekeeping release
+
+ -- Slava Monich <slava.monich@jolla.com>  Mon, 08 Nov 2021 02:44:15 +0200
+
 libmce-glib (1.0.10) unstable; urgency=low
 
   * Hide internal symbols

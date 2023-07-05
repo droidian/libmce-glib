@@ -11,6 +11,8 @@ documentation.list
 installroot
 build
 RPMS
+examples/example
+examples/example.o
 
 # Added by Droidian
 !.circleci/

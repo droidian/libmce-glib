@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2019 Jolla Ltd.
- * Copyright (C) 2019 Slava Monich <slava.monich@jolla.com>
+ * Copyright (C) 2019-2022 Jolla Ltd.
+ * Copyright (C) 2019-2022 Slava Monich <slava.monich@jolla.com>
  *
  * You may use this file under the terms of BSD license as follows:
  *
@@ -28,14 +28,20 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation
+ * are those of the authors and should not be interpreted as representing
+ * any official policies, either expressed or implied.
  */
 
 #ifndef MCE_BATTERY_H
 #define MCE_BATTERY_H
 
+/* Since 1.0.6 */
+
 #include "mce_types.h"
 
-/* Since 1.0.6 */
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
@@ -49,13 +55,13 @@ typedef enum mce_battery_status {
 
 typedef struct mce_battery_priv MceBatteryPriv;
 
-typedef struct mce_battery {
+struct mce_battery {
     GObject object;
     MceBatteryPriv* priv;
     gboolean valid;
     guint level;
     MCE_BATTERY_STATUS status;
-} MceBattery;
+}; /* MceBattery */
 
 typedef void
 (*MceBatteryFunc)(
@@ -100,7 +106,7 @@ mce_battery_remove_handler(
 void
 mce_battery_remove_handlers(
     MceBattery* battery,
-    gulong *ids,
+    gulong* ids,
     guint count);
 
 #define mce_battery_remove_all_handlers(d, ids) \

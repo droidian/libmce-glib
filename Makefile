@@ -19,8 +19,8 @@ all: debug release pkgconfig
 #
 
 VERSION_MAJOR = 1
-VERSION_MINOR = 0
-VERSION_RELEASE = 10
+VERSION_MINOR = 1
+VERSION_RELEASE = 0
 
 # Version for pkg-config
 PCVERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_RELEASE)
@@ -41,6 +41,7 @@ SRC = \
   mce_battery.c \
   mce_charger.c \
   mce_display.c \
+  mce_inactivity.c \
   mce_proxy.c \
   mce_tklock.c
 GEN_SRC = \
@@ -65,7 +66,8 @@ RELEASE_BUILD_DIR = $(BUILD_DIR)/release
 
 CC ?= $(CROSS_COMPILE)gcc
 LD = $(CC)
-DEFINES += -DGLIB_DISABLE_DEPRECATION_WARNINGS
+DEFINES += -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_32 \
+  -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_MAX_ALLOWED
 WARNINGS = -Wall -Wno-unused-parameter -Wno-multichar
 INCLUDES = -I$(INCLUDE_DIR) -I$(GEN_DIR)
 BASE_FLAGS = -fPIC $(CFLAGS)
